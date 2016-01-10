@@ -1,5 +1,6 @@
 Meteor.subscribe("chats");
 Meteor.subscribe("users");
+emojione.ascii = true;
 // Router configuration
 
 Router.configure({
@@ -108,6 +109,13 @@ Template.chat_message.helpers({
     }
   }
 });
+
+Template.chat_message.rendered = function() {
+  var input = document.getElementById('inputText').value;
+  var output = emojione.shortnameToImage(input);
+  document.getElementById('outputText').innerHTML = output;
+}
+
 Template.chat_page.events({
 // this event fires when the user sends a message on the chat page
 'submit .js-send-chat':function(event){
@@ -116,7 +124,6 @@ Template.chat_page.events({
   // see if we can find a chat object in the database
   // to which we'll add the message
   var chat = Chats.findOne({_id:Session.get("chatId")});
-  console.log("Got chat obj with id: " + chat._id);
 
   if (chat){// ok - we have a chat to use
     var msgs = chat.messages; // pull the messages property
@@ -135,12 +142,9 @@ Template.chat_page.events({
     chat.messages = msgs;
     // update the chat object in the database.
     //Chats.update(chat._id, chat);
-    console.log("Attempting add using " + chat._id + ", " + msgs);
     Meteor.call("updateChat", chat._id, msgs, function(err, resp) {
       if (err) {
         console.log("Error with updateChat method call");
-      } else {
-        console.log("Returned success");
       }
     });
   }

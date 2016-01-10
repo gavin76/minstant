@@ -23,7 +23,6 @@ Meteor.methods({
     if (!this.userId) {
       throw new Meteor.Error("not-authorized");
     }
-    console.log("UpdateChat params: " + chatId + ", " + chat);
     Chats.update(chatId, { $set: {messages: chat}});
   },
   insertChat: function(user1Id, user2Id) {
@@ -32,7 +31,6 @@ Meteor.methods({
     }
     var chatId = Chats.insert({user1Id: user1Id,
                   user2Id: user2Id});
-    console.log("Inserted chat, chatId", chatId);
     return true;
   }
 });
