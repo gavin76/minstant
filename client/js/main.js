@@ -71,6 +71,15 @@ Router.route('/chat/:_id', function () {
 // helper functions 
 /// 
 
+Template.navbar.helpers({
+  isLoggedIn: function() {
+    if (Meteor.user()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+});
 Template.nav_dropdown_users.helpers({
   users: function() {
     return Meteor.users.find();
@@ -122,7 +131,7 @@ Template.chat_page.helpers({
   other_user:function(){
     return Session.get("otherUsername");
   }, 
-
+  
 });
 
 Template.chat_message.helpers({
