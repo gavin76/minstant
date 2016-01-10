@@ -66,6 +66,11 @@ Router.route('/chat/:_id', function () {
   }
 });
 
+// Accounts configuration
+Accounts.ui.config({
+  passwordSignupFields: "USERNAME_AND_EMAIL"
+});
+
   
 ///
 // helper functions 
@@ -80,6 +85,7 @@ Template.navbar.helpers({
     }
   }
 });
+
 Template.nav_dropdown_users.helpers({
   users: function() {
     return Meteor.users.find();
@@ -175,20 +181,22 @@ Template.chat_page.events({
     // is a good idea to insert data straight from the form
     // (i.e. the user) into the database?? certainly not. 
     // push adds the message to the end of the array
-
-    msgs.push({text: event.target.chat.value,
-              user_id: Meteor.user()._id });
-    // reset the form
-    event.target.chat.value = "";
-    // put the messages array onto the chat object
-    chat.messages = msgs;
-    // update the chat object in the database.
-    //Chats.update(chat._id, chat);
-    Meteor.call("updateChat", chat._id, msgs, function(err, resp) {
-      if (err) {
-        console.log("Error with updateChat method call");
-      }
-    });
+    var msgInput = event.target.chat.value;
+    if (!msgInput == "") {
+      msgs.push({text: event.target.chat.value,
+                user_id: Meteor.user()._id });
+      // reset the form
+      event.target.chat.value = "";
+      // put the messages array onto the chat object
+      chat.messages = msgs;
+      // update the chat object in the database.
+      //Chats.update(chat._id, chat);
+      Meteor.call("updateChat", chat._id, msgs, function(err, resp) {
+        if (err) {
+          console.log("Error with updateChat method call");
+        }
+      });
+    }
   }
 }
 })
