@@ -11,3 +11,12 @@
 .avatar_sm {
 	height: 20px;
 }
+
+.userText{
+	color: blue;
+	background: green;
+}
+.otherText{
+	color: red;
+	background: white;
+}

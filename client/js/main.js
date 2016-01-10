@@ -8,9 +8,18 @@ Router.configure({
 });
 // specify the top level route, the page users see when they arrive at the site
 Router.route('/', function () {
-  console.log("rendering root /");
-  this.render("navbar", {to:"header"});
-  this.render("lobby_page", {to:"main"});  
+  if (!Meteor.user()) {
+    this.render("navbar", {to: "header"});
+    this.render("about", {to: "main"});
+  } else {
+    this.render("navbar", {to:"header"});
+    this.render("lobby_page", {to:"main"});  
+  }
+});
+
+Router.route('/about', function() {
+  this.render("navbar", {to: "header"});
+  this.render("about", {to: "main"});
 });
 
 // specify a route that allows the current user to chat to another users
@@ -22,6 +31,7 @@ Router.route('/chat/:_id', function () {
     this.render("not_logged_in", {to:"main"});  
   } else {
     var otherUserId = this.params._id;
+    Session.set("otherUsername", Meteor.users.findOne({_id: otherUserId}).profile.username);
     // find a chat that has two users that match current user id
     // and the requested user id
     var filter = {$or:[
@@ -60,11 +70,34 @@ Router.route('/chat/:_id', function () {
 ///
 // helper functions 
 /// 
+
+Template.nav_dropdown_users.helpers({
+  users: function() {
+    return Meteor.users.find();
+  },
+  getUsername: function(userId) {
+    user = Meteor.users.findOne({_id: userId});
+    return user.profile.username;
+  },
+  isMyUser: function(userId) {
+    if (userId == Meteor.userId()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+})
+
+
 Template.available_user_list.helpers({
   users:function(){
     return Meteor.users.find();
+  },
+  currentUser: function() {
+    return Meteor.user().profile.username;
   }
 })
+
 Template.available_user.helpers({
   getUsername:function(userId){
     user = Meteor.users.findOne({_id:userId});
@@ -87,7 +120,7 @@ Template.chat_page.helpers({
     return chat.messages;
   }, 
   other_user:function(){
-    return ""
+    return Session.get("otherUsername");
   }, 
 
 });
