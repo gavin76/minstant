@@ -1,8 +1,17 @@
 Meteor.publish("chats", function() {
-  return Chats.find();
+  if (!this.userId) {
+    console.log("Not logged in");
+  } else {
+    
+    var filter = {$or:[
+                {user1Id:this.userId}, {user2Id:this.userId}            
+                ]};
+    console.log(Chats.find(filter));
+    return Chats.find(filter);
+  }
 });
 Meteor.publish("users", function() {
-  return Meteor.users.find();
+  return Meteor.users.find({}, {fields: {'profile.username': 1, 'profile.avatar': 1}});
 })
 // start up script that creates some users for testing
 // users have the username 'user1@test.com' .. 'user8@test.com'
@@ -22,15 +31,17 @@ Meteor.methods({
   updateChat: function(chatId, chat) {
     if (!this.userId) {
       throw new Meteor.Error("not-authorized");
-    }
+    } else {
     Chats.update(chatId, { $set: {messages: chat}});
+  }
   },
   insertChat: function(user1Id, user2Id) {
     if (!this.userId) {
       throw new Meteor.Error("not-authorized");
-    }
+    } else {
     var chatId = Chats.insert({user1Id: user1Id,
                   user2Id: user2Id});
     return true;
+  }
   }
 });
